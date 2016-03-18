@@ -2,7 +2,7 @@
 
 This is a very simple web server (one file, no setup) capable of listing, viewing and uploading files.
  
-Its main purpose is to serve as an 'emulated printer' for practicing programming contests (instead of wasting paper, it allows to see the code from another computer). It uses [Google Code Prettifier](https://github.com/google/code-prettify) to show the code.
+Its main purpose is to serve as an 'emulated printer' for practicing programming contests (instead of wasting paper, it allows to see the code from another computer). It uses [Google Code Prettify](https://github.com/google/code-prettify) to show the code.
 
 Usage
 =====
