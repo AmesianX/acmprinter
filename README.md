@@ -6,13 +6,9 @@ Its main purpose is to serve as an 'emulated printer' for practicing programming
 
 Usage
 =====
-1. Clone this repository:
+1. Download the server from [here](https://raw.githubusercontent.com/mvpossum/acmprinter/master/acmprinter.py) and place it in an empty folder.
 
-    > git clone https://github.com/mvpossum/acmprinter
-
-    > cd acmprinter
-
-2. Start the server:
+2. Inside the directory, start the server:
 
    > python2 acmprinter.py
 
