@@ -225,7 +225,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         f.write("<input type=\"submit\" value=\"Upload\"/></form>\n")
         f.write("<hr>\n<h2>Directory listing for %s</h2>\n<ul>\n" % displaypath)
         for name in list:
-            if name != os.path.basename(__file__) and name != 'README.md':
+            if name != os.path.basename(__file__) and name != 'README.md' and name[0] != '.' and name[-1] != '~':
                 fullname = os.path.join(path, name)
                 displayname = linkname = name
                 # Append / for directories or @ for symbolic links
@@ -356,20 +356,19 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         '.h': 'text/plain',
         })
 
+	
+try:
+    #Create a web server and define the handler to manage the
+    #incoming request
+    server = BaseHTTPServer.HTTPServer(('', PORT_NUMBER), AcmVirtualPrinter)
+    #ip snipet taken from: http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+    myip=[l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0];
+    print 'The server is accesible through: http://'+ myip+':'+str(PORT_NUMBER)+ '/'
+    
+    #Wait forever for incoming htto requests
+    server.serve_forever()
 
-if __name__ == '__main__':		
-    try:
-        #Create a web server and define the handler to manage the
-        #incoming request
-        server = BaseHTTPServer.HTTPServer(('', PORT_NUMBER), AcmVirtualPrinter)
-        #ip snipet taken from: http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
-        myip=[l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0];
-        print 'The server is accesible through: http://'+ myip+':'+str(PORT_NUMBER)+ '/'
-        
-        #Wait forever for incoming htto requests
-        server.serve_forever()
-
-    except KeyboardInterrupt:
-        print (' received interrupt, shutting down the web server')
-        server.socket.close()
+except KeyboardInterrupt:
+    print (' received interrupt, shutting down the web server')
+    server.socket.close()
 
