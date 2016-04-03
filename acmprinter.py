@@ -46,6 +46,9 @@ def add_unique_postfix(fn):
 
     return None
 
+def getip():
+	return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0];
+    
 class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
 
     """Simple HTTP request handler with GET and HEAD commands.
@@ -221,6 +224,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         f.write("<html>\n<title>Virtual Printer for ACM</title>\n")
         f.write("<body>\n<hr>\n")
         f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
+        f.write("<h2><a href=\"http://%s:%d/\">http://%s:%d/</a></h2><hr>\n" %  (getip(), PORT_NUMBER, getip(), PORT_NUMBER))
         f.write("<input name=\"file\" type=\"file\"/>")
         f.write("<input type=\"submit\" value=\"Upload\"/></form>\n")
         f.write("<hr>\n<h2>Directory listing for %s</h2>\n<ul>\n" % displaypath)
@@ -356,14 +360,12 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         '.h': 'text/plain',
         })
 
-	
 try:
     #Create a web server and define the handler to manage the
     #incoming request
     server = BaseHTTPServer.HTTPServer(('', PORT_NUMBER), AcmVirtualPrinter)
     #ip snipet taken from: http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
-    myip=[l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0];
-    print 'The server is accesible through: http://'+ myip+':'+str(PORT_NUMBER)+ '/'
+    print 'The server is accesible through: http://'+ getip()+':'+str(PORT_NUMBER)+ '/'
     
     #Wait forever for incoming htto requests
     server.serve_forever()
