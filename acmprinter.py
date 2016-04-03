@@ -364,6 +364,8 @@ try:
     #Create a web server and define the handler to manage the
     #incoming request
     server = BaseHTTPServer.HTTPServer(('', PORT_NUMBER), AcmVirtualPrinter)
+    if len(sys.argv)==2:
+		PORT_NUMBER=int(sys.argv[1])
     #ip snipet taken from: http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
     print 'The server is accesible through: http://'+ getip()+':'+str(PORT_NUMBER)+ '/'
     
