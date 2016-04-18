@@ -28,7 +28,6 @@ except ImportError:
 
 
 PORT_NUMBER = 8080
-SOURCE_LIMIT = 100 #in KB
 
 def add_unique_postfix(fn):
     if not os.path.exists(fn):
@@ -109,9 +108,6 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
     def deal_post_data(self):
         boundary = self.headers.plisttext.split("=")[1]
         remainbytes = int(self.headers['content-length'])
-        if remainbytes>1024*SOURCE_LIMIT:
-            self.rfile.read(remainbytes)
-            return (False, "File too big")
         line = self.rfile.readline()
         remainbytes -= len(line)
         if not boundary in line:
@@ -358,6 +354,8 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         '.c': 'text/plain',
         '.cpp': 'text/plain',
         '.h': 'text/plain',
+        '.in': 'text/plain',
+        '.out': 'text/plain',
         })
 
 try:
