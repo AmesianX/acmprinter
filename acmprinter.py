@@ -21,6 +21,8 @@ import shutil
 import mimetypes
 import socket
 import re
+import errno
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -28,6 +30,7 @@ except ImportError:
 
 
 PORT_NUMBER = 8080
+PRINTER_FOLDER = "printed_files"
 
 def add_unique_postfix(fn):
     if not os.path.exists(fn):
@@ -225,7 +228,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         f.write("<input type=\"submit\" value=\"Upload\"/></form>\n")
         f.write("<hr>\n<h2>Directory listing for %s</h2>\n<ul>\n" % displaypath)
         for name in list:
-            if name != os.path.basename(__file__) and name != 'README.md' and name[0] != '.' and name[-1] != '~':
+            if name[0] != '.' and name[-1] != '~':
                 fullname = os.path.join(path, name)
                 displayname = linkname = name
                 # Append / for directories or @ for symbolic links
@@ -295,7 +298,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         path = posixpath.normpath(urllib.unquote(path))
         words = path.split('/')
         words = filter(None, words)
-        path = os.getcwd()
+        path = PRINTER_FOLDER
         for word in words:
             drive, word = os.path.splitdrive(word)
             head, word = os.path.split(word)
@@ -359,6 +362,11 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         })
 
 try:
+    try:
+        os.mkdir(PRINTER_FOLDER)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
     #Create a web server and define the handler to manage the
     #incoming request
     server = BaseHTTPServer.HTTPServer(('', PORT_NUMBER), AcmVirtualPrinter)
