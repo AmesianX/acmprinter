@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """Virtual Printer for ACM.
 
 Simple web server to upload and see files.
