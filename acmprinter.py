@@ -47,6 +47,15 @@ def add_unique_postfix(fn):
             return uni_fn
 
     return None
+    
+def empty_folder(folder):
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(e)
 
 def getip():
 	return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0];
@@ -83,6 +92,12 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
             f.close()
 
     def do_POST(self):
+        if self.path=="/clean":
+            empty_folder(self.translate_path('/'))
+            self.send_response(301)
+            self.send_header('Location','/')
+            self.end_headers()
+            return
         """Serve a POST request."""
         r, info = self.deal_post_data()
         print info, "by: ", self.client_address
@@ -96,7 +111,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             f.write("<strong>Failed:</strong>")
         f.write(info)
-        f.write("<br><a href=\"%s\">back</a>" % self.headers['referer'])
+        f.write("<br><a href=\"%s\">Go Back</a>" % self.headers['referer'])
         f.write("</body>\n</html>\n")
         length = f.tell()
         f.seek(0)
@@ -226,6 +241,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         f.write("<h2><a href=\"http://%s:%d/\">http://%s:%d/</a></h2><hr>\n" %  (getip(), PORT_NUMBER, getip(), PORT_NUMBER))
         f.write("<input name=\"file\" type=\"file\"/>")
         f.write("<input type=\"submit\" value=\"Upload\"/></form>\n")
+        f.write("<form onsubmit=\"return confirm('Do you really want to  delete ALL the files?');\" method=\"post\" action=\"clean\"><input style=\"float:right;\"   type=\"submit\" value=\"Delete All Files\"/></form>\n")
         f.write("<hr>\n<h2>Directory listing for %s</h2>\n<ul>\n" % displaypath)
         for name in list:
             if name[0] != '.' and name[-1] != '~':
@@ -255,7 +271,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         out.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
         out.write("<html>\n<title>%s</title>\n" % os.path.basename(path))
         out.write("<script src=\"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js\"></script>")
-        out.write("<body><a href=\"javascript:location.href = document.referrer\">Go Back</a><pre class=\"prettyprint linenums\">\n")
+        out.write("<body><a href=\"%s\">Go Back</a><pre class=\"prettyprint linenums\">\n" % self.headers['referer'])
         try:
             # Always read in binary mode. Opening files in text mode may cause
             # newline translations, making the actual size of the content
