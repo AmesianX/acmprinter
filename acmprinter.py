@@ -252,7 +252,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         out.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
         out.write("<html>\n<title>%s</title>\n" % os.path.basename(path))
         out.write("<script src=\"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js\"></script>")
-        out.write("<body><pre class=\"prettyprint linenums\">\n")
+        out.write("<body><a href=\"javascript:location.href = document.referrer\">Go Back</a><pre class=\"prettyprint linenums\">\n")
         try:
             # Always read in binary mode. Opening files in text mode may cause
             # newline translations, making the actual size of the content
