@@ -22,6 +22,7 @@ import mimetypes
 import socket
 import re
 import errno
+import argparse
 
 try:
     from cStringIO import StringIO
@@ -29,8 +30,7 @@ except ImportError:
     from StringIO import StringIO
 
 
-PORT_NUMBER = 8080
-PRINTER_FOLDER = "printed_files"
+port_number = 8080
 
 def add_unique_postfix(fn):
     if not os.path.exists(fn):
@@ -238,7 +238,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         f.write("<html>\n<title>Virtual Printer for ACM</title>\n")
         f.write("<body>\n<hr>\n")
         f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
-        f.write("<h2><a href=\"http://%s:%d/\">http://%s:%d/</a></h2><hr>\n" %  (getip(), PORT_NUMBER, getip(), PORT_NUMBER))
+        f.write("<h2><a href=\"http://%s:%d/\">http://%s:%d/</a></h2><hr>\n" %  (getip(), port_number, getip(), port_number))
         f.write("<input name=\"file\" type=\"file\"/>")
         f.write("<input type=\"submit\" value=\"Upload\"/></form>\n")
         f.write("<form onsubmit=\"return confirm('Do you really want to  delete ALL the files?');\" method=\"post\" action=\"clean\"><input style=\"float:right;\"   type=\"submit\" value=\"Delete All Files\"/></form>\n")
@@ -314,7 +314,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         path = posixpath.normpath(urllib.unquote(path))
         words = path.split('/')
         words = filter(None, words)
-        path = PRINTER_FOLDER
+        path = str(port_number)
         for word in words:
             drive, word = os.path.splitdrive(word)
             head, word = os.path.split(word)
@@ -378,18 +378,22 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         })
 
 try:
+    parser = argparse.ArgumentParser(description='Virtual Printer for ACM.')
+    parser.add_argument('-p', dest='port_number', action='store',
+                       default=8080, type=int,
+                       help='Port to access the printer')
+    args = parser.parse_args()
+    port_number=args.port_number
     try:
-        os.mkdir(PRINTER_FOLDER)
+        os.mkdir(str(port_number))
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
     #Create a web server and define the handler to manage the
     #incoming request
-    server = BaseHTTPServer.HTTPServer(('', PORT_NUMBER), AcmVirtualPrinter)
-    if len(sys.argv)==2:
-		PORT_NUMBER=int(sys.argv[1])
+    server = BaseHTTPServer.HTTPServer(('', port_number), AcmVirtualPrinter)
     #ip snipet taken from: http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
-    print 'The server is accesible through: http://'+ getip()+':'+str(PORT_NUMBER)+ '/'
+    print 'The server is accesible through: http://'+ getip()+':'+str(port_number)+ '/'
     
     #Wait forever for incoming htto requests
     server.serve_forever()
