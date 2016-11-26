@@ -201,6 +201,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         if len(parts)>=3 and parts[1]=='raw':
             path = '/'.join(parts[:1]+parts[2:])
             ctype = self.extensions_map['']
+        print(os.path.basename(path))
         if ctype=='text/plain':
             return self.display_source(path)
         try:
@@ -215,6 +216,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", ctype)
             fs = os.fstat(f.fileno())
+            self.send_header("Content-Disposition", 'filename="x%s"' % (os.path.basename(path)))
             self.send_header("Content-Length", str(fs[6]))
             self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
             self.end_headers()
