@@ -111,7 +111,8 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             f.write("<strong>Failed:</strong>")
         f.write(info)
-        f.write("<br><a href=\"%s\">Go Back</a>" % self.headers['referer'])
+        if 'referer' in self.headers:
+            f.write("<br><a href=\"%s\">Go Back</a>" % self.headers['referer'])
         f.write("</body>\n</html>\n")
         length = f.tell()
         f.seek(0)
@@ -271,7 +272,10 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         out.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
         out.write("<html>\n<title>%s</title>\n" % os.path.basename(path))
         out.write("<script src=\"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js\"></script>")
-        out.write("<body><a href=\"%s\">Go Back</a><pre class=\"prettyprint linenums\">\n" % self.headers['referer'])
+        out.write('<body>')
+        if 'referer' in self.headers:
+            out.write("<a href=\"%s\">Go Back</a>" % self.headers['referer'])
+        out.write('<pre class=\"prettyprint linenums\">\n')
         try:
             # Always read in binary mode. Opening files in text mode may cause
             # newline translations, making the actual size of the content
