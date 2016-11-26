@@ -216,7 +216,7 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", ctype)
             fs = os.fstat(f.fileno())
-            self.send_header("Content-Disposition", 'filename="x%s"' % (os.path.basename(path)))
+            self.send_header("Content-Disposition", 'filename="%s"' % (os.path.basename(path)))
             self.send_header("Content-Length", str(fs[6]))
             self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
             self.end_headers()
