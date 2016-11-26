@@ -197,6 +197,10 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
             else:
                 return self.list_directory(path)
         ctype = self.guess_type(path)
+        parts = path.split('/')
+        if len(parts)>=3 and parts[1]=='raw':
+            path = '/'.join(parts[:1]+parts[2:])
+            ctype = self.extensions_map['']
         if ctype=='text/plain':
             return self.display_source(path)
         try:
@@ -289,6 +293,8 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
             return None
         try:
             out.write("</pre>\n</body>\n</html>\n")
+            linkname = '/'.join(['raw']+path.split('/')[1:])
+            out.write("<br/><a href=\"%s\">Download file</a>" % urllib.quote(linkname))
             length = out.tell()
             out.seek(0)
             self.send_response(200)
@@ -358,7 +364,6 @@ class AcmVirtualPrinter(BaseHTTPServer.BaseHTTPRequestHandler):
         slow) to look inside the data to make a better guess.
 
         """
-
         base, ext = posixpath.splitext(path)
         if ext in self.extensions_map:
             return self.extensions_map[ext]
